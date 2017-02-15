@@ -5,22 +5,19 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: exam <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/02/07 11:36:35 by exam              #+#    #+#             */
-/*   Updated: 2017/02/13 23:28:38 by vinvimo          ###   ########.fr       */
+/*   Created: 2017/02/14 13:21:17 by exam              #+#    #+#             */
+/*   Updated: 2017/02/14 13:54:35 by exam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "brackets.h"
 #include <unistd.h>
 
-#include <stdio.h>
-
-void	ft_putchar(char c)
+void ft_putchar(char c)
 {
 	write(1, &c, 1);
 }
 
-void	ft_putstr(char *str)
+void ft_putstr(char *str)
 {
 	int i;
 
@@ -29,76 +26,79 @@ void	ft_putstr(char *str)
 		ft_putchar(str[i++]);
 }
 
-char	get_closing(char c)
+char get_open(char c)
 {
-	if (c == '(')
-		c = ')';
-	else if (c == '[')
-		c = ']';
-	else if (c == '{')
-		c = '}';
-	return (c);
+	char open;
+	
+	open = 0;
+	if (c == ')')
+		open = '(';
+	else if (c == ']')
+		open = '[';
+	else if (c == '}')
+		open = '{';
+	return (open);
 }
 
-void	reset_abc(t_struct *v)
+int check(char *argv, int index)
 {
-	v->a = 0;
-	v->aa = 0;
-	v->b = 0;
-	v->bb = 0;
-	v->c = 0;
-	v->cc = 0;
-	v->x = 0;
-	v->y = 0;
-	v->z = 0;
+	if (index == -1)
+		return (-1);
+	index = 0;
+	while (argv[index] && argv[index] != '(' && argv[index] != '['
+	&& argv[index] != '{' && argv[index] != ')' && argv[index] != ']'
+	&& argv[index] != '}')
+		index++;
+	if (argv[index] == 0)
+		return (1);
+	return (0);
 }
 
-void	reset_bc(t_struct *v)
+int brackets(char *argv)
 {
-	v->b = 0;
-	v->bb = 0;
-	v->c = 0;
-	v->cc = 0;
-	v->y = 0;
-	v->z = 0;
-}
-
-int		brackets(char *argv)
-{
-	int			index;
-	t_struct	v;
+	int		index;
+	char	open;
 
 	index = 0;
 	while (argv[index]
-	&& (argv[index] != ')' || argv[index] != ']' || argv[index] != '}'))
+	&& argv[index] != ')' && argv[index] != ']' && argv[index] != '}')
 		index++;
-	v.a = get_closing(argv[index]);
-	v.aa = argv[index];
-	while (index >= 0 && argv[index] != v.a)
+	if (argv[index] != 0)
 	{
+		open = get_open(argv[index]);
+		while (index >= 0 && argv[index] != open)
+		{
+			argv[index] = ' ';
+			index--;
+		}
 		argv[index] = ' ';
-		index--;
 	}
-	if (index >= 0)
-		argv[index] = ' ';
-	else
+	if (check(argv, index) == 1)
+	{
+		ft_putstr("OK\n");
+		return (0);
+	}
+	else if (check(argv, index) == -1)
 	{
 		ft_putstr("Error\n");
 		return (0);
 	}
-	index++;
+	else
+		brackets(argv);
 	return (0);
 }
 
-int		main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	int i;
 
 	i = 1;
-	if (argc >= 2)
-		while (i < argc)
-			brackets(argv[i++]);
-	else
+	while (i < argc)
+	{
+		brackets(argv[i]);
+		i++;
+	}
+	if (argc == 1)
 		ft_putchar('\n');
 	return (0);
 }
