@@ -6,7 +6,7 @@
 /*   By: exam <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/14 13:21:17 by exam              #+#    #+#             */
-/*   Updated: 2017/02/14 13:54:35 by exam             ###   ########.fr       */
+/*   Updated: 2017/02/16 00:54:57 by vinvimo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,24 +26,8 @@ void ft_putstr(char *str)
 		ft_putchar(str[i++]);
 }
 
-char get_open(char c)
-{
-	char open;
-	
-	open = 0;
-	if (c == ')')
-		open = '(';
-	else if (c == ']')
-		open = '[';
-	else if (c == '}')
-		open = '{';
-	return (open);
-}
-
 int check(char *argv, int index)
 {
-	if (index == -1)
-		return (-1);
 	index = 0;
 	while (argv[index] && argv[index] != '(' && argv[index] != '['
 	&& argv[index] != '{' && argv[index] != ')' && argv[index] != ']'
@@ -54,33 +38,50 @@ int check(char *argv, int index)
 	return (0);
 }
 
+char get_open(char c)
+{
+	char open;
+
+	open = 0;
+	if (c == ')')
+		open = '(';
+	else if (c == ']')
+		open = '[';
+	else if (c == '}')
+		open = '{';
+	return (open);
+}
+
 int brackets(char *argv)
 {
 	int		index;
+	int		sig;
 	char	open;
 
 	index = 0;
+	sig = 1;
 	while (argv[index]
 	&& argv[index] != ')' && argv[index] != ']' && argv[index] != '}')
 		index++;
-	if (argv[index] != 0)
+	if (argv[index] == 0)
+		sig = 0;
+	open = get_open(argv[index]);
+	while (index >= 0
+	&& argv[index] != '(' && argv[index] != '[' && argv[index] != '{')
 	{
-		open = get_open(argv[index]);
-		while (index >= 0 && argv[index] != open)
-		{
-			argv[index] = ' ';
-			index--;
-		}
 		argv[index] = ' ';
+		index--;
 	}
-	if (check(argv, index) == 1)
-	{
-		ft_putstr("OK\n");
-		return (0);
-	}
-	else if (check(argv, index) == -1)
+	if ((sig == 1 && index == -1) || (index >= 0 && argv[index] != open))
 	{
 		ft_putstr("Error\n");
+		return (0);
+	}
+	if (index >= 0)
+		argv[index] = ' ';
+	if ((sig == 0 && index == -1) || check(argv, index) == 1)
+	{
+		ft_putstr("OK\n");
 		return (0);
 	}
 	else
